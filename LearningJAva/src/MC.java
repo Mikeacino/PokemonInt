@@ -4,18 +4,6 @@ public class MC {
 This program will calculate the value of a Pokemon's stats. Much of this is very game specific knowledge, so some of it
 	may not be intuitive. I will try to explain why I made certain choices. I have yet to account for bad input in general.*/
 	static Pokemon poke = new Pokemon();
-	static int [] maxIndividualValue = {31, 31, 31, 31, 31, 31};
-	//IVs vary between 0 and 31, for this program we only care that they be maximized, In my next program these will change.
-	static int [] effortValue = {0, 0, 0, 0, 0, 0};
-	//EVs can be between 0 and 255, with a maximum total of 510.
-	static int userNature = 0;
-	//This variable is used to determine user input. If I resolve my issues with Scanners, I can make this a local variable.
-	static int userPokemon = 0;
-	//Similarly This variable should also not be here, but I have trouble with Scanners. If I could make multiple scanners then
-	//I could make these variables local.
-	static int totalEV = 0;
-	//These next variables will hopefully be replaced with an API, when I have power and Internet available >_>
-	static String pokemonName = "";
 	static int [] venusaurBaseStats = {80, 82, 83, 100, 100, 80};
 	static int [] blastoiseBaseStats = {79, 83, 100, 85, 105, 78};
 	static int [] charizardBaseStats = {78, 84, 78, 109, 85, 100};
@@ -26,11 +14,22 @@ This program will calculate the value of a Pokemon's stats. Much of this is very
 	static int [] miloticBaseStats = {95, 60, 79, 100, 125, 81};
 	static int [] metagrossBaseStats = {80, 135, 130, 95, 90, 70};
 	static int [] salamenceBaseStats = {95, 135, 80, 110, 80, 100};
+	static int [] maxIndividualValue = {31, 31, 31, 31, 31, 31};
+	//IVs vary between 0 and 31, for this program we only care that they be maximized, In my next program these will change.
+	static int [] effortValue = {0, 0, 0, 0, 0, 0};
+	//EVs can be between 0 and 255, with a maximum total of 510.
+	static int userNature = 0;
+	//This variable is used to determine user input. If I resolve my issues with Scanners, I can make this a local variable.
+	static int userPokemon = 0;
+	//Similarly This variable should also not be here, but I have trouble with Scanners. If I could make multiple scanners then
+	//I could make these variables local.
+	//These next variables will hopefully be replaced with an API, when I have power and Internet available >_>
+	static String pokemonName = "";
 	public static void main(String[] args) {
-		intro();
+		introduceMaxStatCalc();
 		getUserInput();
 		calculateNature();
-		iChooseYou();
+		choosePokemon();
 		printStats();
 	}
 	public static void getUserInput() {
@@ -47,11 +46,11 @@ This program will calculate the value of a Pokemon's stats. Much of this is very
 				+ "(23) Sassy\t(24) Serious\t(25) Timid");
 		userNature = userInput.nextInt();
 		for (int i = 0; i < 6; i++) {
-			if (totalEV < 510) {
+			if (poke.getTotalEV() < 510) {
 				System.out.println("\nHow many effort values are in " + poke.getStatNames(i) + "?");
 				effortValue[i] = userInput.nextInt();
 				if (effortValue[i] < 256) {
-					totalEV = totalEV + effortValue[i];	
+					poke.setTotalEV(poke.getTotalEV() + effortValue[i]);	
 				}
 				else {
 					System.out.println("Oops! There seems to be an error. Please check your EVs.\nThere can only be 255 EVs in "
@@ -60,12 +59,12 @@ This program will calculate the value of a Pokemon's stats. Much of this is very
 					i = -1;
 				}
 			}
-			else if (totalEV == 510) {
+			else if (poke.getTotalEV() == 510) {
 				break;
 			}
 			else {
 				System.out.println("Oops! There seems to be an error. Please check your EVs.\nThere can only be 510 EVs in "
-						+ "total.\nTotal EVs: " + totalEV);
+						+ "total.\nTotal EVs: " + poke.getTotalEV());
 				resetEV();
 				i = -1;
 			}
@@ -76,59 +75,61 @@ This program will calculate the value of a Pokemon's stats. Much of this is very
 		for (int i = 0; i < 6; i++) {
 			effortValue[i] = 0;
 		}
-		totalEV = 0;
+		poke.setTotalEV(0);
 	}
-	public static void intro() {
+	public static void introduceMaxStatCalc() {
 		System.out.println("\t\tWelcome to my Pokemon max stat calculator!");
 		System.out.println("This program currently displays the max stats for select pokemon at a given level!");
 	}
-	public static void iChooseYou() {
-		if (userPokemon == 1) {
-			pokemonName = "Venusaur";
-			poke.setAsBaseStats(venusaurBaseStats);
-		}
-		else if (userPokemon == 2) {
-			pokemonName = "Blastoise";
-			poke.setAsBaseStats(blastoiseBaseStats);
-		}
-		else if (userPokemon == 3) {
-			pokemonName = "Charizard";
-			poke.setAsBaseStats(charizardBaseStats);
-		}
-		else if (userPokemon == 4) {
-			pokemonName = "Pikachu";
-			poke.setAsBaseStats(pikachuBaseStats);
-		}
-		else if (userPokemon == 5) {
-			pokemonName = "Dragonite";
-			poke.setAsBaseStats(dragoniteBaseStats);
-		}
-		else if (userPokemon == 6) {
-			pokemonName = "Mew";
-			poke.setAsBaseStats(mewBaseStats);
-		}
-		else if (userPokemon == 7) {
-			pokemonName = "Tyranitar";
-			poke.setAsBaseStats(tyranitarBaseStats);
-		}
-		else if (userPokemon == 8) {
-			pokemonName = "Milotic";
-			poke.setAsBaseStats(miloticBaseStats);
-		}
-		else if (userPokemon == 9) {
-			pokemonName = "Metagross";
-			poke.setAsBaseStats(metagrossBaseStats);
-		}
-		else if (userPokemon == 10) {
-			pokemonName = "Salamence";
-			poke.setAsBaseStats(salamenceBaseStats);
-		}
+	public static void choosePokemon() {
+		switch (userPokemon) {
+			case 1:
+				pokemonName = "Venusaur";
+				poke.setAsBaseStats(venusaurBaseStats);
+				break;
+			case 2:
+				pokemonName = "Blastoise";
+				poke.setAsBaseStats(blastoiseBaseStats);
+				break;
+			case 3:
+				pokemonName = "Charizard";
+				poke.setAsBaseStats(charizardBaseStats);
+				break;
+			case 4:
+				pokemonName = "Pikachu";
+				poke.setAsBaseStats(pikachuBaseStats);
+				break;
+			case 5:
+				pokemonName = "Dragonite";
+				poke.setAsBaseStats(dragoniteBaseStats);
+				break;
+			case 6:
+				pokemonName = "Mew";
+				poke.setAsBaseStats(mewBaseStats);
+				break;
+			case 7:
+				pokemonName = "Tyranitar";
+				poke.setAsBaseStats(tyranitarBaseStats);
+				break;
+			case 8:
+				pokemonName = "Milotic";
+				poke.setAsBaseStats(miloticBaseStats);
+				break;
+			case 9:
+				pokemonName = "Metagross";
+				poke.setAsBaseStats(metagrossBaseStats);
+				break;
+			case 10:
+				pokemonName = "Salamence";
+				poke.setAsBaseStats(salamenceBaseStats);
+				break;
+		}			
 	}
 	public static void calculateNature() {
-		//There's an error here.....probably.....somewhere....
-		//This section and the associated sysout line could be made clearer if I made an array of all possible natures and 
-		//looped through the array. Also then I could print the nature in the printStats() method. The issue is that I don't
-		//know if that is better than the current setup in terms of memory or readability.
+		/*There's an error here.....probably.....somewhere....
+		A pokemon's nature raises one stat by 10% and lowers another by 10%. The HP stat is never raised or lowered, so we have
+		a total of 25 natures. 
+		*/
 		if (userNature == 1) {
 			poke.setNature(2, 3);
 		}
@@ -205,6 +206,6 @@ This program will calculate the value of a Pokemon's stats. Much of this is very
 			int baseStats = (int) stats;
 			System.out.println(poke.getStatNames(j) + ":\t" + baseStats);
 		}
-		System.out.println("Total EVs: " + totalEV);
+		System.out.println("Total EVs: " + poke.getTotalEV());
 	}
 }

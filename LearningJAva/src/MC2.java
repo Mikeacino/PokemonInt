@@ -2,20 +2,12 @@ import java.util.Scanner;
 
 public class MC2 {
 	
-	
-	//SCRAPPED UNTIL FURTHER NOTICE
-
-//Datamined formulas are not returning values consistent with the in game values, so until i can correct the formula, the project is scrapped.
-
-	//"use floor and maybe round up at the end ot the equation??"
-	
 	/*This is my Pokemon IV Calculator.
 	The function runs similarly to my previous program, it just solves the stats equation for a different variable.
 	The only issue is that any calculation that involves rounding, like this one, has potential errors. Only a level 100 
 	Pokemon can give perfectly accurate IVs. Even then, there are cases where IVs cannot be determined definitively.*/
 	
 	static Pokemon poke = new Pokemon();
-	static int [] maxIndividualValue = {0, 0, 0, 0, 0, 0};
 	static int [] effortValue = {0, 0, 0, 0, 0, 0};
 	//EVs can be between 0 and 255, with a maximum total of 510.
 	static int userNature = 0;

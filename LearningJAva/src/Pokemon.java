@@ -4,6 +4,7 @@ public class Pokemon {
 	private String [] statNames = {"Hp", "Att", "Def", "SpAtt", "SpDef", "Speed"};
 	private int [] baseStats = {0, 0, 0, 0, 0, 0};
 	static double [] nature = {1, 1, 1, 1, 1, 1};
+	static int totalEV = 0;
 	
 	public int getLevel() {
 		return level;
@@ -28,4 +29,11 @@ public class Pokemon {
 	public double getNature(int a) {
 		return nature[a];
 	}
+	public void setTotalEV(int a) {
+		totalEV = a;
+	}
+	public int getTotalEV() {
+		return totalEV;
+	}
 }
+
