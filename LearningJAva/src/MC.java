@@ -13,21 +13,18 @@ public class MC {
  *A double is a double-precision 64-bit IEEE 754 floating point.
  *A boolean has only two values, true or false.
  *A char is a single 16-bit Unicode character.*/
-	
-/*This program will calculate the value of a Pokemon's stats. Much of this is very 
- * game specific knowledge, so some of it may not be intuitive. I will try to explain
- * why I made certain choices. This program still does not take bad input in most 
- * cases. Much of this program could be cut down with the use of a Pokemon APi.*/
   
-/*A Pokemon must have IVs, EVs, a level, a nature, base stats, and a type. Each 
- * attribute has limitations, but for the purpose of this program just know that all
- * of these attributes of a Pokemon are needed for an equation to find it's current 
- * stats.*/
-  /*My print methods are where I ran into issues with integer division. In the past
-   * I used only integers in this equation, but it caused miscalculations. Now I set 
-   * the natureMultiplier array as a double. This causes the result of the equation to 
-   * be a double. I then cast the resulting double to an int before printing it.
-   * */
+/*A Pokemon's stats are calculated with 6 variables: IVs, EVs, level, nature, 
+ * base stats, and current stats. All Pokemon have a type that is linked with their 
+ * base stats, but it's not used in calculations. Each variable has limitations that
+ * will be accounted for in error handling. Solving for any variable requires 
+ * the other 5.*/
+  
+/*My print methods are where I ran into issues with integer division. In the past
+ * I used only integers in this equation, but it caused miscalculations. Now I set 
+ * the natureMultiplier array as a double. This causes the result of the equation to 
+ * be a double. I then cast the resulting double to an int before printing it.
+ * */
   
 	public static void main(String[] args) {
 	  int [] customBaseStats = {0, 0, 0, 0, 0, 0};
@@ -90,8 +87,6 @@ public class MC {
     return choice;
   }
   
-//These three methods are needed for all aspects of my program. 
-//There is no case where we need to solve for these aspects of a Pokemon.
   public static void getUserLevel(Scanner scan, Pokemon poke) {
 //This section gets the Pokemon's level from the user.
     System.out.println("\nWhat level is your pokemon?");
@@ -148,6 +143,7 @@ public class MC {
         + "Salamence");
     poke.setUserPokemonChoice(scan.nextInt());
   }
+  
   public static void printStats(Pokemon poke) {
 //This section simply prints the stats of a Pokemon.
     System.out.println("\n\t"+poke.getPokemonName()+"\nLv:"+poke.getLevel()
