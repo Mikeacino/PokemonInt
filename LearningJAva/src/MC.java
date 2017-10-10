@@ -1,211 +1,190 @@
 import java.util.Scanner;
 public class MC {
-/*Michael Carracino 
-This program will calculate the value of a Pokemon's stats. Much of this is very game specific knowledge, so some of it
-	may not be intuitive. I will try to explain why I made certain choices. I have yet to account for bad input in general.*/
-	static Pokemon poke = new Pokemon();
-	static int [] venusaurBaseStats = {80, 82, 83, 100, 100, 80};
-	static int [] blastoiseBaseStats = {79, 83, 100, 85, 105, 78};
-	static int [] charizardBaseStats = {78, 84, 78, 109, 85, 100};
-	static int [] pikachuBaseStats = {35, 55, 40, 50, 50, 90};
-	static int [] dragoniteBaseStats = {91, 134, 95, 100, 100, 80};
-	static int [] mewBaseStats = {100, 100, 100, 100, 100, 100};
-	static int [] tyranitarBaseStats = {100, 134, 110, 95, 100, 61};
-	static int [] miloticBaseStats = {95, 60, 79, 100, 125, 81};
-	static int [] metagrossBaseStats = {80, 135, 130, 95, 90, 70};
-	static int [] salamenceBaseStats = {95, 135, 80, 110, 80, 100};
-	static int [] maxIndividualValue = {31, 31, 31, 31, 31, 31};
-	//IVs vary between 0 and 31, for this program we only care that they be maximized, In my next program these will change.
-	static int [] effortValue = {0, 0, 0, 0, 0, 0};
-	//EVs can be between 0 and 255, with a maximum total of 510.
-	static int userNature = 0;
-	//This variable is used to determine user input. If I resolve my issues with Scanners, I can make this a local variable.
-	static int userPokemon = 0;
-	//Similarly This variable should also not be here, but I have trouble with Scanners. If I could make multiple scanners then
-	//I could make these variables local.
-	//These next variables will hopefully be replaced with an API, when I have power and Internet available >_>
-	static String pokemonName = "";
+//Michael Carracino 																																
+/*A variable is place in memory that has a data type, but not a definite value. the 
+ *value of a variable can be changed during the runtime of a program.
+ *there are eight primitive data types, byte, short, int, long, float, double, 
+ *boolean, and char. 
+ *A byte is an 8-bit signed two's complement integer with a range of (-128, 127). 
+ *A short is a 16-bit signed two's complement integer with a range of (-32768,32767).
+ *An int is a 32-bit signed two's complement integer with a range of (-2^31,(2^31)-1)
+ *A long is a 64-bit signed two's complement integer with a range of (-2^63,(2^63)-1)
+ *A float is a single-precision 32-bitIEEE 754 floating point.
+ *A double is a double-precision 64-bit IEEE 754 floating point.
+ *A boolean has only two values, true or false.
+ *A char is a single 16-bit Unicode character.*/
+	
+/*This program will calculate the value of a Pokemon's stats. Much of this is very 
+ * game specific knowledge, so some of it may not be intuitive. I will try to explain
+ * why I made certain choices. This program still does not take bad input in most 
+ * cases. Much of this program could be cut down with the use of a Pokemon APi.*/
+  
+/*A Pokemon must have IVs, EVs, a level, a nature, base stats, and a type. Each 
+ * attribute has limitations, but for the purpose of this program just know that all
+ * of these attributes of a Pokemon are needed for an equation to find it's current 
+ * stats.*/
+  /*My print methods are where I ran into issues with integer division. In the past
+   * I used only integers in this equation, but it caused miscalculations. Now I set 
+   * the natureMultiplier array as a double. This causes the result of the equation to 
+   * be a double. I then cast the resulting double to an int before printing it.
+   * */
+  
 	public static void main(String[] args) {
-		introduceMaxStatCalc();
-		getUserInput();
-		calculateNature();
-		choosePokemon();
-		printStats();
-	}
-	public static void getUserInput() {
+	  int [] customBaseStats = {0, 0, 0, 0, 0, 0};
+	  int userProgramChoice = 0;
 		Scanner userInput = new Scanner(System.in);
-		System.out.println("\nPlease choose a pokemon below:\n");
-		System.out.println("(1)Venusaur\t(2)Blastoise\t(3)Charizard\n(4)Pikachu\t(5)Dragonite\t(6)Mew\n(7)Tyranitar\t"
-				+ "(8)Milotic\t(9)Metagross\n(10)Salamence");
-		userPokemon = userInput.nextInt();
-		System.out.println("\nWhat level is your pokemon?");
-		poke.setLevel(userInput.nextInt());	
-		System.out.println("\nWhat is your pokemon's Nature?\n(1)  Adamant\t(2)  Bashful\t(3)  Bold\t(4)  Brave\t(5)  Calm\n"
-				+ "(6)  Careful\t(7)  Docile\t(8)  Gentle\t(9)  Hardy\t(10) Hasty\n(11) Impish\t(12) Jolly\t(13) Lax\t(14) "
-				+ "Lonely\t(15) Mild\n(16) Modest\t(17) Naive\t(18) Naughty\t(19) Quiet\t(20) Quirky\n(21) Rash\t(22) Relaxed\t"
-				+ "(23) Sassy\t(24) Serious\t(25) Timid");
-		userNature = userInput.nextInt();
-		for (int i = 0; i < 6; i++) {
-			if (poke.getTotalEV() < 510) {
-				System.out.println("\nHow many effort values are in " + poke.getStatNames(i) + "?");
-				effortValue[i] = userInput.nextInt();
-				if (effortValue[i] < 256) {
-					poke.setTotalEV(poke.getTotalEV() + effortValue[i]);	
-				}
-				else {
-					System.out.println("Oops! There seems to be an error. Please check your EVs.\nThere can only be 255 EVs in "
-							+ "any one stat\nYou entered: " + effortValue[i]);
-					resetEV();
-					i = -1;
-				}
-			}
-			else if (poke.getTotalEV() == 510) {
-				break;
-			}
-			else {
-				System.out.println("Oops! There seems to be an error. Please check your EVs.\nThere can only be 510 EVs in "
-						+ "total.\nTotal EVs: " + poke.getTotalEV());
-				resetEV();
-				i = -1;
-			}
-		}
-		userInput.close();
+ 		userProgramChoice = introduceMain(userInput);
+ 		switch (userProgramChoice) {
+ 		  case 1:
+ 		    Pokemon poke1 = new Pokemon();
+ 		    getUserType(userInput, poke1);
+ 		    getUserLevel(userInput, poke1);
+ 		    getUserNature(userInput, poke1);
+ 		    getUserEffortValues(userInput, poke1);
+   			poke1.calculateNature(poke1.getUserNatureChoice());
+   			poke1.choosePokemon(poke1.getUserPokemonChoice());
+   			poke1.solveCurrentStats();
+   			printStats(poke1);
+   			break;
+ 		  case 2:
+ 		    Pokemon poke2 = new Pokemon();
+ 		    getUserType(userInput, poke2);
+ 		    getUserLevel(userInput, poke2);
+ 		    getUserNature(userInput, poke2);
+ 		    getUserEffortValues(userInput, poke2);
+   			getCurrentStats(userInput, poke2);
+   			poke2.calculateNature(poke2.getUserNatureChoice());
+   			poke2.choosePokemon(poke2.getUserPokemonChoice());
+   			poke2.solveForIVs();
+   			printIVs(poke2);
+   			break;
+ 		  case 3:
+ 		    customBaseStats = getCustomBaseStats(userInput);
+ 		    Pokemon poke3 = new Pokemon(customBaseStats);
+ 		    getUserCustomType(userInput, poke3); 
+ 		    getUserLevel(userInput, poke3);
+        getUserNature(userInput, poke3);
+        getUserEffortValues(userInput, poke3);
+        poke3.calculateNature(poke3.getUserNatureChoice());
+        poke3.solveCurrentStats();
+        printStats(poke3);
+ 		  case 4:
+ 		    System.out.println("Thanks for using my program!");
+ 		    break;
+    }
+    userInput.close();
 	}
-	public static void resetEV(){
-		for (int i = 0; i < 6; i++) {
-			effortValue[i] = 0;
-		}
-		poke.setTotalEV(0);
-	}
-	public static void introduceMaxStatCalc() {
-		System.out.println("\t\tWelcome to my Pokemon max stat calculator!");
-		System.out.println("This program currently displays the max stats for select pokemon at a given level!");
-	}
-	public static void choosePokemon() {
-		switch (userPokemon) {
-			case 1:
-				pokemonName = "Venusaur";
-				poke.setAsBaseStats(venusaurBaseStats);
-				break;
-			case 2:
-				pokemonName = "Blastoise";
-				poke.setAsBaseStats(blastoiseBaseStats);
-				break;
-			case 3:
-				pokemonName = "Charizard";
-				poke.setAsBaseStats(charizardBaseStats);
-				break;
-			case 4:
-				pokemonName = "Pikachu";
-				poke.setAsBaseStats(pikachuBaseStats);
-				break;
-			case 5:
-				pokemonName = "Dragonite";
-				poke.setAsBaseStats(dragoniteBaseStats);
-				break;
-			case 6:
-				pokemonName = "Mew";
-				poke.setAsBaseStats(mewBaseStats);
-				break;
-			case 7:
-				pokemonName = "Tyranitar";
-				poke.setAsBaseStats(tyranitarBaseStats);
-				break;
-			case 8:
-				pokemonName = "Milotic";
-				poke.setAsBaseStats(miloticBaseStats);
-				break;
-			case 9:
-				pokemonName = "Metagross";
-				poke.setAsBaseStats(metagrossBaseStats);
-				break;
-			case 10:
-				pokemonName = "Salamence";
-				poke.setAsBaseStats(salamenceBaseStats);
-				break;
-		}			
-	}
-	public static void calculateNature() {
-		/*There's an error here.....probably.....somewhere....
-		A pokemon's nature raises one stat by 10% and lowers another by 10%. The HP stat is never raised or lowered, so we have
-		a total of 25 natures. 
-		*/
-		if (userNature == 1) {
-			poke.setNature(2, 3);
-		}
-		else if (userNature == 3) {
-			poke.setNature(2,1);
-		}
-		else if (userNature == 4) {
-			poke.setNature(1,5);
-		}
-		else if (userNature == 5) {
-			poke.setNature(4,1);
-		}
-		else if (userNature == 6) {
-			poke.setNature(4,3);
-		}
-		else if (userNature == 8) {
-			poke.setNature(4,2);
-		}
-		else if (userNature == 10) {
-			poke.setNature(5,2);
-		}
-		else if (userNature == 11) {
-			poke.setNature(2,3);
-		}
-		else if (userNature == 12) {
-			poke.setNature(5,3);
-		}
-		else if (userNature == 13) {
-			poke.setNature(2,4);
-		}
-		else if (userNature == 14) {
-			poke.setNature(1,2);
-		}
-		else if (userNature == 15) {
-			poke.setNature(3,2);
-		}
-		else if (userNature == 16) {
-			poke.setNature(3,1);
-		}
-		else if (userNature == 17) {
-			poke.setNature(5, 4);
-		}
-		else if (userNature == 18) {
-			poke.setNature(1,4);
-		}
-		else if (userNature == 19) {
-			poke.setNature(3,5);
-		}
-		else if (userNature == 21) {
-			poke.setNature(3,4);
-		}
-		else if (userNature == 22) {
-			poke.setNature(2,5);
-		}
-		else if (userNature == 23) {
-			poke.setNature(4,5);
-		}
-		else if (userNature == 25) {
-			poke.setNature(5,1);
-		}
-		else{
-		}
-	}
-	public static void printStats() {
-		//Wow.. so this part is the formula that is used in game. No explaining will really make this part better. HP has a 
-		//different equation that the other 5 stats.
-		System.out.println("\nLvl: "+poke.getLevel()+"\t"+pokemonName);
-		int healthPoints = ((maxIndividualValue[0] + 2*poke.getBaseStats(0) + (effortValue[0]/4))*poke.getLevel()/100) + 10 + 
-				poke.getLevel();
-		System.out.println(poke.getStatNames(0) + ":\t" + healthPoints);
-		for (int j = 1; j < 6; j++){
-			double stats = (maxIndividualValue[j] + 2*poke.getBaseStats(j) + (effortValue[j]/4))*poke.getLevel()/100 + 5;//*nature
-			stats = poke.getNature(j)*stats;
-			int baseStats = (int) stats;
-			System.out.println(poke.getStatNames(j) + ":\t" + baseStats);
-		}
-		System.out.println("Total EVs: " + poke.getTotalEV());
+	
+  public static int introduceMain(Scanner scan) {
+    int choice = 0;
+    try {
+      System.out.println("\t\tWelcome to my Pokemon Program!");
+      System.out.println("This program currently has two functions. Please choose "
+          + "a function:\n(1)Max stat calculator\t\t(2)IV calculator\n(3)Build a "
+          + "Pokemon\t\t(4)End Program");
+      choice = scan.nextInt();
+    }
+    catch (Exception e) {
+      System.out.println("Sorry, there seems to be an error.");
+    }
+    return choice;
+  }
+  
+//These three methods are needed for all aspects of my program. 
+//There is no case where we need to solve for these aspects of a Pokemon.
+  public static void getUserLevel(Scanner scan, Pokemon poke) {
+//This section gets the Pokemon's level from the user.
+    System.out.println("\nWhat level is your pokemon?");
+    poke.setLevel(scan.nextInt());  
+  }
+  public static void getUserNature(Scanner scan, Pokemon poke) {
+//This section gets the Pokemon's nature from the user.
+    System.out.println("Please choose a nature for Your Pokemon!");
+    System.out.println("\n(1)Hardy\t(2)Bold\t\t(3)Modest\t(4)Calm\t\t(5)Timid"
+        + "\n(6)Lonely\t(7)Docile\t(8)Mild\t\t(9)Gentle\t(10)Hasty"
+        + "\n(11)Adamant\t(12)Impish\t(13)Serious\t(14)Careful\t(15)Jolly"
+        + "\n(16)Naughty\t(17)Lax\t\t(18)Rash\t(19)Bashful\t(20)Naive"
+        + "\n(21)Brave\t(22)Relaxed\t(23)Quiet\t(24)Sassy\t(25)Quirky");
+    poke.setUserNatureChoice(scan.nextInt());   
+  }
+  public static void getUserEffortValues(Scanner scan, Pokemon poke) {
+//For this next section I use a loop to get the EVs for each stat. Each stat can
+//have a maximum of 255 EVs, and a max total of 510 EVs.
+    for (int i = 0; i < 6; i++) {
+      if (poke.getTotalEV() < 510) {
+        System.out.println("\nHow many effort values are in "
+            +poke.getStatNames(i) + "?");
+        poke.setEV(i, scan.nextInt());
+        if (poke.getEV(i) < 256) {
+          poke.setTotalEV(poke.getTotalEV() + poke.getEV(i)); 
+        }
+        else {
+          System.out.println("Oops! There seems to be an error. "
+              + "Please check your EVs.\nThere can only be 255 EVs in "
+              + "any one stat\nYou entered: " + poke.getEV(i));
+          poke.resetEV();
+          i = -1;
+        }
+      }
+      else if (poke.getTotalEV() == 510) {
+        break;
+      }
+      else {
+        System.out.println("Oops! There seems to be an error. "
+            + "Please check your EVs.\nThere can only be 510 EVs in "
+            + "total.\nTotal EVs: " + poke.getTotalEV());
+        poke.resetEV();
+        i = -1;
+      }
+    }
+  }
+  
+  public static void getUserType(Scanner scan, Pokemon poke) {
+//This method gets data from the user that are essential for any calculations.
+    System.out.println("\nPlease choose a pokemon below:");
+//This section gets the Pokemon's type.
+    System.out.println("(1)Venusaur\t(2)Blastoise\t(3)Charizard\n(4)Pikachu\t(5)"
+        + "Dragonite\t(6)Mew\n(7)Tyranitar\t(8)Milotic\t(9)Metagross\n(10)"
+        + "Salamence");
+    poke.setUserPokemonChoice(scan.nextInt());
+  }
+  public static void printStats(Pokemon poke) {
+//This section simply prints the stats of a Pokemon.
+    System.out.println("\n\t"+poke.getPokemonName()+"\nLv:"+poke.getLevel()
+        +"\t\t" + poke.getPokemonNature()+"\n");
+    for (int i = 0; i < 6; i++) {
+      System.out.println(poke.getStatNames(i) + ":\t" + poke.getCurrentStats(i));
+    }
+    System.out.println("Total EVs: " + poke.getTotalEV());
+  }
+  
+  public static void getCurrentStats(Scanner userInput, Pokemon poke) {
+    System.out.println("Please enter your Pokemon's stats.");
+    for (int i = 0; i < 6; i++) {
+      System.out.println(poke.getStatNames(i) + ":\t");
+      poke.setCurrentStats(i,userInput.nextInt());
+    }
+  }
+  public static void printIVs(Pokemon poke) {
+//This section solves the Pokemon stat equation for the IV variable. 
+    for (int i = 0; i < 6; i ++) {    
+      System.out.println(poke.getStatNames(i) + ":\t" + poke.getIV(i));
+    }
+  }  
+  
+  public static int[] getCustomBaseStats(Scanner scan) {
+    String [] statNames = {"Hp", "Att", "Def", "SpAtt", "SpDef", "Speed"};
+    int [] baseStats = {0, 0, 0, 0, 0, 0};
+    System.out.println("Please enter your Pokemon's base stats.");
+    for (int i = 0; i < 6; i++) {
+      System.out.println(statNames[i] + ": ");
+      baseStats[i] = scan.nextInt();
+    }
+    return baseStats;
+  }
+	public static void getUserCustomType(Scanner scan, Pokemon poke) {
+	  System.out.println("Please enter Your Pokemon's type!");
+	  scan.nextLine();
+	  poke.setPokemonType(scan.nextLine().toString());
 	}
 }
