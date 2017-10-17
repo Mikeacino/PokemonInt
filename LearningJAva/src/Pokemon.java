@@ -5,6 +5,8 @@ public class Pokemon {
 	private int [] baseStats = {0, 0, 0, 0, 0, 0};
 	private int [] individualValue = {0, 0, 0, 0, 0, 0};
 	private int [] currentStats = {0, 0, 0, 0, 0, 0};
+	private int [] minimumStats = {0, 0, 0, 0, 0, 0};
+	private int [] maximumStats = {0, 0, 0, 0, 0, 0};
 	
 //This next array is a double so that I can avoid the issues with integer division.
 	private double [] natureMultiplier = {1, 1, 1, 1, 1, 1};
@@ -39,7 +41,7 @@ public class Pokemon {
 	private static int [] salamenceBaseStats = {95, 135, 80, 110, 80, 100};
 	
 //This is the default constructor for my class.
-	public Pokemon() {}
+	//public Pokemon() {}
 	
 	public Pokemon(int [] baseStats) {
 	  setAsBaseStats(baseStats);
@@ -47,10 +49,10 @@ public class Pokemon {
 	
 //Get and Set for the currentStats array values.	
 //In this method, 'a' is the parameter.
-	public int getCurrentStats(int a) {
+	public int getCurrentStat(int a) {
 		return currentStats[a];
 	}
-	public void setCurrentStats(int a, int b) {
+	public void setCurrentStat(int a, int b) {
 		this.currentStats[a] = b;
 	}
 	
@@ -119,17 +121,16 @@ public class Pokemon {
 	public int getTotalEV() {
 		return totalEV;
 	}
-	
-//These next few methods are used for print statements.
-	public String getPokemonName() {
+
+//Get and Set for the PokemonType variable.
+	public String getPokemonType() {
 		return pokemonType;
 	}
 	public void setPokemonType(String s) {
 	  this.pokemonType = s;
 	}
-	public String getPokemonNature() {
-		return pokemonNature;
-	}
+
+
 	public String getStatNames(int a) {
 			return statNames[a];
 	}
@@ -137,43 +138,85 @@ public class Pokemon {
 	    return natureNames[a];
 	}
 	
-	//This method is used for error handling.
-	public void resetEV(){
+//This method is used for error handling.
+	public void resetAllEV(){
 		for (int i = 0; i < 6; i++) {
 			effortValue[i] = 0;
 		}
 		this.setTotalEV(0);
 	}
 	
-	public void solveCurrentStats() {
-//This calculates the current stats for a Pokemon.
-	  setCurrentStats(0, ((31 + 2*getBaseStats(0) + (getEV(0)/4))*getLevel()/100) + 
-	      10 + getLevel());
-	  for (int i = 1; i < 6; i ++) {
-      setCurrentStats(i, (int) (Math.floor((31 + 2*getBaseStats(i) + 
-          (getEV(i)/4))*getLevel()/100 + 5)*getNatureMult(i)));
+	public void resetOneEV(int a) {
+	  effortValue[a] = 0;
+	}
+	
+//Get and Set for maximumStats array values
+	public int getMaxStat(int a) {
+	  return maximumStats[a];
+	}
+	public void setMaxStat(int a, int b) {
+	  this.maximumStats[a] = b;
+	}
+	
+//Get and Set for the minimumStats array values
+	public int getMinStat(int a) {
+    return minimumStats[a];
+  }
+  public void setMinStat(int a, int b) {
+    this.minimumStats[a] = b;
+  }
+
+//This method calculates the minimum stats for a pokemon.
+	public void calculateMinStats() { 
+	  minimumStats[0] = (int) Math.floor((2*baseStats[0] + (effortValue[0]/4))*level/100 + 10 + level);
+    for (int i = 1; i < 6; i++) {
+      minimumStats[i] = (int) Math.floor(((2*baseStats[i] + (effortValue[i]/4))*level/100 + 5)*natureMultiplier[i]);
     }
 	}
 	
-	public void solveForIVs() {
-//This method calculates the IVs of a Pokemon.
-	   setIV(0, ((getCurrentStats(0)-getLevel()-
-	        10)*(100/getLevel())-(getEV(0)/4)-2*getBaseStats(0)));
-	   for (int j = 1; j < 6; j++){
-	      setIV(j, (int) Math.ceil((getCurrentStats(j)/getNatureMult(j) - 5)*(100/getLevel()) - (getEV(j)/4) - 2*getBaseStats(j)));
-	      System.out.println(getIV(j));
-	   }
-	}
+  // This method calculates the maximum stats for a pokemon
+  public void calculateMaxStats() {
+    maximumStats[0] = (int) (Math
+        .floor((31 + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100)
+        + 10 + level);
+    for (int i = 1; i < 6; i++) {
+      maximumStats[i] = (int) (Math.floor(
+          (31 + 2 * baseStats[i] + (effortValue[i]/4)) * level / 100 + 5) * natureMultiplier[i]);
+    }
+  }
+
+  public void solveCurrentStats() {
+    // This calculates the current stats for a Pokemon. BROKEN
+    currentStats[0] = (int) (Math
+        .floor((31 + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100)
+        + 10 + level);
+    for (int i = 1; i < 6; i++) {
+      currentStats[i] = (int) (Math.floor(
+          (31 + 2 * baseStats[i] + (effortValue[i] / 4)) * level / 100 + 5)
+          * natureMultiplier[i]);
+    }
+  }
+
+  public void solveForIVs() {
+    // This method calculates the IVs of a Pokemon.
+    individualValue[0] = ((currentStats[0] - level - 10) * (100 / level)
+        - (effortValue[0] / 4) - 2 * baseStats[0]);
+    for (int i = 1; i < 6; i++) {
+      individualValue[i] = (int) Math
+          .ceil((currentStats[i] / natureMultiplier[i] - 5) * (100 / level)
+              - (effortValue[i] / 4) - 2 * baseStats[i]);
+    }
+  }
 	
 	public void choosePokemon(int choice) {
 		switch (choice) {
-			case 1:
-				setPokemonType("Venusaur");
-				setAsBaseStats(venusaurBaseStats);
-				break;
-			case 2:
-			  setPokemonType("Blastoise");
-				setAsBaseStats(blastoiseBaseStats);
+      case 1:
+        setPokemonType("Venusaur");
+        setAsBaseStats(venusaurBaseStats);
+        break;
+      case 2:
+        setPokemonType("Blastoise");
+        setAsBaseStats(blastoiseBaseStats);
 				break;
 			case 3:
 			  setPokemonType("Charizard");
@@ -209,7 +252,11 @@ public class Pokemon {
 				break;
 		}			
 	}
-	
+
+	//Pokemon nature is set in the calculateNature method.
+  public String getPokemonNature() {
+    return pokemonNature;
+  }
 	public void calculateNature(int natureChoice) {
 		/*A pokemon's nature raises one stat by 10% and lowers another by 10%. The 
 		 * HP stat is never raised or lowered, so we have a total of 25 possible natures. 
