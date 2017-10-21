@@ -41,7 +41,7 @@ public class Pokemon {
 	private static int [] salamenceBaseStats = {95, 135, 80, 110, 80, 100};
 	
 //This is the default constructor for my class.
-	//public Pokemon() {}
+	public Pokemon() {}
 	
 	public Pokemon(int [] baseStats) {
 	  setAsBaseStats(baseStats);
@@ -186,7 +186,7 @@ public class Pokemon {
   }
 
   public void solveCurrentStats() {
-    // This calculates the current stats for a Pokemon. BROKEN
+    // This calculates the current stats for a Pokemon.
     currentStats[0] = (int) (Math
         .floor((31 + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100)
         + 10 + level);
@@ -207,63 +207,24 @@ public class Pokemon {
               - (effortValue[i] / 4) - 2 * baseStats[i]);
     }
   }
-	
+//This method sets the user type.
 	public void choosePokemon(int choice) {
-		switch (choice) {
-      case 1:
-        setPokemonType("Venusaur");
-        setAsBaseStats(venusaurBaseStats);
-        break;
-      case 2:
-        setPokemonType("Blastoise");
-        setAsBaseStats(blastoiseBaseStats);
-				break;
-			case 3:
-			  setPokemonType("Charizard");
-				setAsBaseStats(charizardBaseStats);
-				break;
-			case 4:
-			  setPokemonType("Pikachu");
-				setAsBaseStats(pikachuBaseStats);
-				break;
-			case 5:
-			  setPokemonType("Dragonite");
-				setAsBaseStats(dragoniteBaseStats);
-				break;
-			case 6:
-			  setPokemonType("Mew");
-				setAsBaseStats(mewBaseStats);
-				break;
-			case 7:
-			  setPokemonType("Tyranitar");
-				setAsBaseStats(tyranitarBaseStats);
-				break;
-			case 8:
-			  setPokemonType("Milotic");
-				setAsBaseStats(miloticBaseStats);
-				break;
-			case 9:
-			  setPokemonType("Metagross");
-				setAsBaseStats(metagrossBaseStats);
-				break;
-			case 10:
-			  setPokemonType("Salamence");
-				setAsBaseStats(salamenceBaseStats);
-				break;
-		}			
+					
 	}
 
-	//Pokemon nature is set in the calculateNature method.
+//Pokemon nature is set in the calculateNature method.
   public String getPokemonNature() {
     return pokemonNature;
   }
+
+//This method sets the natureMult array and the Pokemon's nature
 	public void calculateNature(int natureChoice) {
 		/*A pokemon's nature raises one stat by 10% and lowers another by 10%. The 
 		 * HP stat is never raised or lowered, so we have a total of 25 possible natures. 
 		*/
 		switch (natureChoice) {
 			case 1:
-				//This case is where the same stat is both raised and lowered.
+//This case is where the same stat is both raised and lowered, canceling out.
 				pokemonNature = natureNames(0);
 				break;
 			case 2:
@@ -287,7 +248,7 @@ public class Pokemon {
 				pokemonNature = natureNames(5);
 				break;
 			case 7:
-				//This case is where the same stat is both raised and lowered.
+//This case is where the same stat is both raised and lowered, canceling out.
 				pokemonNature = natureNames(6);
 				break;
 			case 8:
@@ -311,7 +272,7 @@ public class Pokemon {
 				pokemonNature = natureNames(11);
 				break;
 			case 13:
-				//This case is where the same stat is both raised and lowered.
+//This case is where the same stat is both raised and lowered, canceling out.
 				pokemonNature = natureNames(12);
 				break;
 			case 14:
@@ -334,7 +295,7 @@ public class Pokemon {
 				setNatureMult(3, 4);
 				pokemonNature = natureNames(17);
 			case 19:
-				//This case is where the same stat is both raised and lowered.
+//This case is where the same stat is both raised and lowered, canceling out.
 				pokemonNature = natureNames(18);
 				break;
 			case 20:
@@ -358,7 +319,7 @@ public class Pokemon {
 				pokemonNature = natureNames(23);
 				break;
 			case 25:
-				//This case is where the same stat is both raised and lowered.
+//This case is where the same stat is both raised and lowered, canceling out.
 				pokemonNature = natureNames(24);
 				break;
 		}			

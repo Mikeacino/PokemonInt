@@ -1,4 +1,13 @@
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 public class MC {
 //Michael Carracino 																																
 /*A variable is place in memory that has a data type, but not a definite value. the 
@@ -23,64 +32,97 @@ public class MC {
  * the natureMultiplier array as a double. This causes the result of the equation to 
  * be a double. I then cast the resulting double to an int before printing it.
  * */
-	public static void main(String[] args) {
-	  int [] customBaseStats = {0, 0, 0, 0, 0, 0};
-	  int userProgramChoice = 0;
-	  boolean endProgram = false;
-		Scanner userInput = new Scanner(System.in);
- 		userProgramChoice = introduceMain(userInput);  //checked
- 		while (endProgram == false) {
-      Pokemon poke;
-   		switch (userProgramChoice) {
-   		  case 1:
-   		    poke = new Pokemon(null);
-   		    getUserType(userInput, poke);  
-   		    getUserLevel(userInput, poke); 
-   		    getUserNature(userInput, poke);  
-   		    getUserEffortValues(userInput, poke);  
-     			poke.calculateNature(poke.getUserNatureChoice());
-     			poke.choosePokemon(poke.getUserPokemonChoice());
-     			poke.solveCurrentStats();
-     			printCurrentStats(poke);
-     			endProgram = true;
-     			break;
-   		  case 2:
-   		    poke = new Pokemon(null);
-   		    getUserType(userInput, poke);  
-          poke.choosePokemon(poke.getUserPokemonChoice());
-   		    getUserLevel(userInput, poke); 
-   		    getUserNature(userInput, poke);  
-          poke.calculateNature(poke.getUserNatureChoice());
-   		    getUserEffortValues(userInput, poke);
-   		    poke.calculateMinStats();
-   		    poke.calculateMaxStats();
-     			getCurrentStats(userInput, poke); 
-     			poke.solveForIVs();
-     			printIVs(poke);
-     			endProgram = true;
-     			break;
-   		  case 3:
-   		    customBaseStats = getCustomBaseStats(userInput); 
-   		    poke = new Pokemon(customBaseStats);
-   		    getUserCustomType(userInput, poke);  
-   		    getUserLevel(userInput, poke); 
-          getUserNature(userInput, poke); 
-          getUserEffortValues(userInput, poke); 
-          poke.calculateNature(poke.getUserNatureChoice());
-          //poke.solveCurrentStats();
-          printCurrentStats(poke);
-          endProgram = true;
-          break;
-   		  case 4:
-   		    System.out.println("Thanks for using my program!");
-   		    endProgram = true;
+  public static void main(String[] args) {
+    try {
+      // This URL is missing data. ex: "009/", "Charizard/"
+      HttpURLConnection connection = null;
+      String unfinishedURL = "";
+      URL url = new URL("https://pokeapi.co/api/v2/pokemon/719/");
+      connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+      BufferedReader in = new BufferedReader(
+          new InputStreamReader(connection.getInputStream()));
+      
+      JSONParser parser  = new JSONParser();
+      String inputLine = in.readLine();
+      
+      JSONObject obj = (JSONObject) parser.parse(inputLine);
+      JSONArray stat_array = (JSONArray) obj.get("stats");
+      JSONObject stat = (JSONObject) stat_array.get(0); 
+      JSONObject statData = (JSONObject) stat.get("stat");
+      long baseStat = (long) stat.get("base_stat");
+      System.out.println(obj.get("name"));  //This line prints the pokemon name.
+      System.out.println(statData.get("name")); //this returns the stat name
+      System.out.println(baseStat); //this line gets the value of the stat.
+      
+      //JSONObject statArray = (JSONObject) obj.get(0); //this line is unnecessary? 
+      //System.out.println(statArray); //this is still too much raw data.
+      //System.out.println(stat.get("name")); //This should return the stat name.
+      //System.out.println(statData.get("base_stat")); //this returns null
+      
+      
+      
+      
+      int userProgramChoice = 0;
+      boolean endProgram = false;
+      Scanner userInput = new Scanner(System.in);
+      userProgramChoice = introduceMain(userInput); // checked
+      while (endProgram == false) {
+        Pokemon poke;
+        switch (userProgramChoice) {
+          case 1:
+            poke = new Pokemon(null);
+            getUserType(userInput, poke);
+            getUserLevel(userInput, poke);
+            getUserNature(userInput, poke);
+            getUserEffortValues(userInput, poke);
+            poke.calculateNature(poke.getUserNatureChoice());
+            poke.choosePokemon(poke.getUserPokemonChoice());
+            poke.solveCurrentStats();
+            printCurrentStats(poke);
+            endProgram = askToContinue(userInput, endProgram);
+            break;
+          case 2:
+            poke = new Pokemon();
+            getUserType(userInput, poke);
+            poke.choosePokemon(poke.getUserPokemonChoice());
+            getUserLevel(userInput, poke);
+            getUserNature(userInput, poke);
+            poke.calculateNature(poke.getUserNatureChoice());
+            getUserEffortValues(userInput, poke);
+            poke.calculateMinStats();
+            poke.calculateMaxStats();
+            getCurrentStats(userInput, poke);
+            poke.solveForIVs();
+            printIVs(poke);
+            endProgram = askToContinue(userInput, endProgram);
+            break;
+          case 3:
+            // This Battle Calculator requires an API. There is simply too much
+            // data required.
+            System.out.println("This section is still in progress!");
+            // endProgram = askToContinue(userInput, endProgram);
+            break;
+          case 4:
+            System.out.println("Thanks for using my program!");
+            endProgram = true;
+        }
       }
- 		}
-    userInput.close();
-	}
-	
-/*This method decides which set of methods is executed. It has error checking. It
- * specifically is executed without an object, so unused objects are not created.*/
+      userInput.close();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+/*This method decides which set of methods is executed. It specifically is executed
+ * without an object, so unused objects are not created.*/
   public static int introduceMain(Scanner scan) {
     int choice = 0;
     boolean validInput = false;
@@ -89,7 +131,7 @@ public class MC {
     while (validInput == false) {
       try {
         System.out.println("(1) Current stat calculator\t(2) IV calculator\n(3) "
-            + "Build a Pokemon\t\t(4) End Program");
+            + "Battle Calculator\t\t(4) End Program");
         choice = scan.nextInt();
         if (choice > 0 && choice < 5) {
           validInput = true;
@@ -107,8 +149,32 @@ public class MC {
     return choice;
   }
   
+//This method asks the user if they want to run the program again.  
+  public static boolean askToContinue(Scanner scan, boolean endProgram) {
+    String userChoice = "";
+    System.out.println("Would you like to run my program again?\n(y)(n)");
+    try {
+      //scan.nextLine();
+      userChoice = scan.nextLine();
+      if (userChoice == "y"||userChoice == "yes") {
+        endProgram = false;
+      }
+      else if (userChoice == "n"||userChoice == "no") {
+        System.out.println("Thanks for using my program!");
+        endProgram = true;
+      }
+      else {
+        System.out.println("bad input 17.");
+      }
+    }
+    catch (Exception any) {
+      System.out.println("There seems to be an error, can you try that again?");
+    }    
+    return endProgram;
+  }
+  
+//This section gets the Pokemon's level from the user.
   public static void getUserLevel(Scanner scan, Pokemon poke) {
-//This section gets the Pokemon's level from the user. It has error checking.
     boolean validInput = false;
     int level = 0;
     while (validInput == false) {
@@ -131,8 +197,8 @@ public class MC {
       }
     }
   }
+//This section gets the Pokemon's nature from the user.
   public static void getUserNature(Scanner scan, Pokemon poke) {
-//This section gets the Pokemon's nature from the user. It has error checking.
     boolean validInput = false;
     int userChoice = 0;
     while (validInput == false) {
@@ -159,9 +225,9 @@ public class MC {
       }
     }
   }
+//This section gets the Pokemon's effort values.
   public static void getUserEffortValues(Scanner scan, Pokemon poke) {
-//For this next section I use an if statement to get the EVs for each stat. Each stat
-//can have a maximum of 255 EVs, and a max total of 510 EVs.
+//Each stat can have a maximum of 255 EVs, and a max total of 510 EVs.
     boolean validInput = false;
     while (validInput == false) {
       try {
@@ -201,16 +267,26 @@ public class MC {
       }
     }
   }
-  
+//This method gets the Pokemon's type.
   public static void getUserType(Scanner scan, Pokemon poke) {
-//This method gets data from the user that are essential for any calculations.
-    while (poke.getUserPokemonChoice() < 1 || poke.getUserPokemonChoice() > 10) {
+    boolean validInput = false;
+    while (validInput == false) {
       try {
-        System.out.println("\nPlease choose a pokemon below:");
-        System.out.println("(1)Venusaur\t(2)Blastoise\t(3)Charizard\n(4)Pikachu\t(5)"
-            + "Dragonite\t(6)Mew\n(7)Tyranitar\t(8)Milotic\t(9)Metagross\n(10)"
-            + "Salamence");
-        poke.setUserPokemonChoice(scan.nextInt());
+        System.out.println("\nPlease enter the name or ID number of your pokemon "
+            + "below!");
+        String userPokemonChoice = scan.nextLine();
+        if (Integer.parseInt(userPokemonChoice) <= 0 ||Integer.parseInt(userPokemonChoice) >= 803) {
+          System.out.println("Error: The ID number you entered is not a valid "
+              + "number\n Please try again!");
+        }
+        else if(userPokemonChoice.length() >= 12|| userPokemonChoice.length() <= 2) {
+          System.out.println("Error: The name you entered is not a valid pokemon "
+              + "name\nPlease try again.");
+        }
+        else {
+          //url.append(userPokemonChoice);
+        }
+        //poke.setUserPokemonChoice(scan.nextInt());
       }
       catch (Exception any) {
         scan.nextLine();
@@ -218,17 +294,7 @@ public class MC {
       }
     }
   }
-  
-  public static void printCurrentStats(Pokemon poke) {
-//This section simply prints the stats of a Pokemon.
-    System.out.println("\n\t"+poke.getPokemonType()+"\nLv:"+poke.getLevel()
-        +"\t\t" + poke.getPokemonNature()+"\n");
-    for (int i = 0; i < 6; i++) {
-      System.out.println(poke.getStatNames(i) + ":\t" + poke.getCurrentStat(i));
-    }
-    System.out.println("Total EVs: " + poke.getTotalEV());
-  }
-  
+//This method gets the Pokemon's current stats.
   public static void getCurrentStats(Scanner scan, Pokemon poke) {
     boolean validInput = false;
     while (validInput == false) {
@@ -255,27 +321,21 @@ public class MC {
       }
     }
   }
-  
+//This method takes the given data and outputs the current stats of the Pokemon.
+  public static void printCurrentStats(Pokemon poke) {
+//This section simply prints the stats of a Pokemon.
+    System.out.println("\n\t"+poke.getPokemonType()+"\nLv:"+poke.getLevel()
+        +"\t\t" + poke.getPokemonNature()+"\n");
+    for (int i = 0; i < 6; i++) {
+      System.out.println(poke.getStatNames(i) + ":\t" + poke.getCurrentStat(i));
+    }
+    System.out.println("Total EVs: " + poke.getTotalEV());
+  }
+//This method takes the given data and outputs the individual values of the Pokemon.
   public static void printIVs(Pokemon poke) {
 //This section solves the Pokemon stat equation for the IV variable. 
     for (int i = 0; i < 6; i ++) {    
       System.out.println(poke.getStatNames(i) + ":\t" + poke.getIV(i));
     }
   }  
-  
-  public static int[] getCustomBaseStats(Scanner scan) {
-    String [] statNames = {"Hp", "Att", "Def", "SpAtt", "SpDef", "Speed"};
-    int [] baseStats = {0, 0, 0, 0, 0, 0};
-    System.out.println("Please enter your Pokemon's base stats.");
-    for (int i = 0; i < 6; i++) {
-      System.out.println(statNames[i] + ": ");
-      baseStats[i] = scan.nextInt();
-    }
-    return baseStats;
-  }
-	public static void getUserCustomType(Scanner scan, Pokemon poke) {
-	  System.out.println("Please enter Your Pokemon's type!");
-	  scan.nextLine();
-	  poke.setPokemonType(scan.nextLine().toString());
-	}
 }
