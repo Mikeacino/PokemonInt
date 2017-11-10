@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,34 +13,7 @@ import org.json.simple.parser.ParseException;
 
 public class MC {
   // Michael Carracino
-  /*
-   * A variable is place in memory that has a data type, but not a definite
-   * value. the value of a variable can be changed during the runtime of a
-   * program. there are eight primitive data types, byte, short, int, long,
-   * float, double, boolean, and char. A byte is an 8-bit signed two's
-   * complement integer with a range of (-128, 127). A short is a 16-bit signed
-   * two's complement integer with a range of (-32768,32767). An int is a 32-bit
-   * signed two's complement integer with a range of (-2^31,(2^31)-1) A long is
-   * a 64-bit signed two's complement integer with a range of (-2^63,(2^63)-1) A
-   * float is a single-precision 32-bitIEEE 754 floating point. A double is a
-   * double-precision 64-bit IEEE 754 floating point. A boolean has only two
-   * values, true or false. A char is a single 16-bit Unicode character.
-   */
-  /*
-   * A Pokemon's stats are calculated with 6 variables: IVs, EVs, level, nature,
-   * base stats, and current stats. All Pokemon have a type that is linked with
-   * their base stats, but it's not used in calculations. Each variable has
-   * limitations that will be accounted for in error handling. Solving for any
-   * variable requires the other 5.
-   */
-  /*
-   * My print methods are where I ran into issues with integer division. In the
-   * past I used only integers in this equation, but it caused miscalculations.
-   * Now I set the natureMultiplier array as a double. This causes the result of
-   * the equation to be a double. I then cast the resulting double to an int
-   * before printing it.
-   */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     int userProgramChoice = 0;
     boolean endProgram = false;
     Scanner userInput = new Scanner(System.in);
@@ -55,7 +29,7 @@ public class MC {
           getUserEffortValues(userInput, poke);
           poke.calculateNature(poke.getUserNatureChoice());
           poke.solveCurrentStats();
-          printCurrentStats(poke);
+          PokemonWindow1 fancy = new PokemonWindow1(poke);
           endProgram = askToContinue(userInput, endProgram);
           break;
         case 2:
@@ -115,8 +89,8 @@ public class MC {
   }
 
   public static void pokemonBackgroundInfo() {
-    System.out
-        .println("Welcome to a quick introduction to the world of Pokemon.\nAs of "
+    System.out.println(
+        "Welcome to a quick introduction to the world of Pokemon.\nAs of "
             + "this intro, there are 802 Pokemon in the Sun and Moon games. \nHere "
             + "are some aspects of a Pokemon:\n\nType:\tThis is the species "
             + "of the Pokemon, e.g. Pikachu, Squirtle, Caterpie, etc.\n\nLevel:\tA "
@@ -129,7 +103,8 @@ public class MC {
             + "give the Pokemon a higher stat.\n\nEffort Value:\tWhenever a Pokemon "
             + "defeats another Pokemon in battle, it gains EVs\n\tdepending on the "
             + "Pokemon defeated. EVs can be applied to any stat, but only up to"
-            + " 255 per\n\tstat, and 510 in total. EVs will increase the pokemon's stat to which they are applied.");
+            + " 255 per\n\tstat, and 510 in total. EVs will increase the pokemon's stat"
+            + " to which they are applied.");
   }
 
   // This method asks the user if they want to run the program again.
@@ -231,7 +206,7 @@ public class MC {
             }
           } else if (poke.getTotalEV() > 510) {
             System.out.println("Oops, there can only be a total of 510, at "
-                + "maximum!/nYou entered: ");
+                + "maximum!\nYou entered: " + poke.getTotalEV());
             poke.resetAllEV();
             i = -1;
           } else {
@@ -244,6 +219,7 @@ public class MC {
       } catch (Exception any) {
         scan.nextLine();
         System.out.println("\nWhoopsadaisy!!");
+        System.out.println(any);
         poke.resetAllEV();
       }
     }
@@ -255,33 +231,51 @@ public class MC {
     while (validInput == false) {
       try {
         int counter = 0;
-        System.out.println(
-            "\nPlease enter the ID number or name of your pokemon below!");
-        String userPokemonChoice = scan.nextLine();
-        int userPokemonID = 0;
-        if (userPokemonID <= 0 || userPokemonID >= 802) {
+        System.out
+            .println("\nPlease enter the ID number of your pokemon below!");
+        int userPokemonChoice = scan.nextInt();
+        if (userPokemonChoice <= 0 || userPokemonChoice >= 802) {
           System.out.println("Error: The ID number you entered is not a valid "
               + "number\n Please try again!");
         } else {
+          poke.setPokemonID(userPokemonChoice);
           HttpURLConnection connection = null;
           String finishedURL = "https://pokeapi.co/api/v2/pokemon/"
-              + userPokemonChoice;
+              + poke.getPokemonID();
           URL url = new URL(finishedURL);
           connection = (HttpURLConnection) url.openConnection();
           connection.setRequestMethod("GET");
           connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-
+          
+          System.out.println("Getting your Pokemon's data!");
+          
           BufferedReader in = new BufferedReader(
               new InputStreamReader(connection.getInputStream()));
 
           JSONParser parser = new JSONParser();
           String inputLine = in.readLine();
 
-          // This object gets the pokemon's name.
+          // Parse the raw data into a JSON Object
           JSONObject obj = (JSONObject) parser.parse(inputLine);
-          poke.setPokemonName((String) obj.get("name"));
-          System.out.println("You chose " + obj.get("name"));
 
+          //This section gets the Pokemon's types
+          List<?> typeList = (List) obj.get("types");
+
+          for (int i = 0; i < typeList.size(); i++) {
+            JSONObject type = (JSONObject) typeList.get(i);
+            JSONObject typeData = (JSONObject) type.get("type");
+            String typeName = (String) typeData.get("name");
+            typeName = typeName.substring(0,1).toUpperCase()+typeName.substring(1, 
+                typeName.length());
+            poke.setTypeList(i, typeName);        
+          }
+       
+          
+          // This sets the pokemon name
+          poke.setPokemonName((String) obj.get("name"));
+          String temporaryName = poke.getPokemonName();
+          System.out.println("Got " + temporaryName.substring(0,1).toUpperCase() + temporaryName.substring(1,temporaryName.length())+"'s data!");
+          
           // These objects get the value of the pokemon's base stats.
           JSONArray stat_array = (JSONArray) obj.get("stats");
           for (int i = 5; i > -1; i--) {
@@ -299,8 +293,9 @@ public class MC {
       } catch (ParseException e) {
       } catch (Exception e) {
         scan.nextLine();
+        System.out.println("Exception " + e);
         System.out
-            .println("Sorry, the input you entered is not valid, please try "
+            .println("Sorry, something went wrong, please try "
                 + "again.");
       }
     }

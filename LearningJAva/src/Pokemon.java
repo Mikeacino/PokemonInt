@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 public class Pokemon {
   // Michael Carracino
   // The arrays below are used for the Pokemon final equation.
@@ -14,23 +16,41 @@ public class Pokemon {
 
   // The variables below are used in various parts of the program
   private String pokemonName = "";
+  private int pokemonID = 1;
 
   private int level;
   private int totalEV = 0;
-  private String pokemonType = "";
-  static String pokemonNature = "";
+  private String pokemonSpecies = "";
+  private String pokemonNature = "";
 
   // These two variables below are used for my decision structures.
-  int userNatureChoice = 0;
-  int userPokemonChoice = 0;
+  private int userNatureChoice = 0;
+  private int userPokemonChoice = 0;
+  private HashMap<Integer, String> typeList = new HashMap<Integer, String>();
+
+  //Get, Set, and size for the typeList Dictionary
+  public String getTypeList(int a) {
+    return typeList.get(a);
+  }
+  public void setTypeList(int a, String b) {
+    this.typeList.put(a, b);
+  }
+  public int numberOfTypes() {
+    return typeList.size();
+  }
 
   // These arrays are used for print statements.
   private String[] statNames = { "Hp", "Att", "Def", "SpAtt", "SpDef",
       "Speed" };
+  
   private String[] natureNames = { "Hardy", "Bold", "Modest", "Calm", "Timid",
       "Lonely", "Docile", "Mild", "Gentle", "Hasty", "Adamant", "Impish",
       "Serious", "Careful", "Jolly", "Naughty", "Lax", "Rash", "Bashful",
       "Naive", "Brave", "Relaxed", "Quiet", "Sassy", "Quirky" };
+  
+  private String[] typeNames = { "Normal", "Fighting", "Psychic", "Ghost",
+      "Dark", "Bug", "Flying", "Fire", "Grass", "Water", "Rock", "Ground",
+      "Steel", "Fairy", "Electric", "Ice", "Dragon", "Fairy", "Poison" };
 
   // This is the default constructor for my class.
   public Pokemon() {
@@ -44,6 +64,15 @@ public class Pokemon {
 
   public void setCurrentStat(int a, int b) {
     this.currentStats[a] = b;
+  }
+
+  // Get and Set for the pokemonID variabel
+  public int getPokemonID() {
+    return pokemonID;
+  }
+
+  public void setPokemonID(int pokemonID) {
+    this.pokemonID = pokemonID;
   }
 
   // Get and Set for the pokemonName variable
@@ -131,11 +160,11 @@ public class Pokemon {
 
   // Get and Set for the PokemonType variable.
   public String getPokemonType() {
-    return pokemonType;
+    return pokemonSpecies;
   }
 
-  public void setPokemonType(String s) {
-    this.pokemonType = s;
+  public void setPokemonSpecies(String s) {
+    this.pokemonSpecies = s;
   }
 
   public String getStatNames(int a) {
