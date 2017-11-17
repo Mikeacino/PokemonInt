@@ -1,63 +1,82 @@
+
+///////////// Michael Carracino /////////////
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Pokemon {
-  // Michael Carracino
-  // The arrays below are used for the Pokemon final equation.
+  // The arrays below are used for the Pokemon stat formula.
   private int[] effortValue = { 0, 0, 0, 0, 0, 0 };
-  private int[] baseStats = { 0, 0, 0, 0, 0, 0 };
+  private static int[] baseStats = { 0, 0, 0, 0, 0, 0 };
   private int[] individualValue = { 0, 0, 0, 0, 0, 0 };
   private int[] currentStats = { 0, 0, 0, 0, 0, 0 };
   private int[] minimumStats = { 0, 0, 0, 0, 0, 0 };
   private int[] maximumStats = { 0, 0, 0, 0, 0, 0 };
 
-  // This next array is a double so that I can avoid the issues with integer
-  // division.
+  // This next array is a double so I can avoid issues with integer division
   private double[] natureMultiplier = { 1, 1, 1, 1, 1, 1 };
 
-  // The variables below are used in various parts of the program
-  private String pokemonName = "";
+  // This section is to know which pokemon the user is trying to select
   private int pokemonID = 1;
 
+  // The variables below are used in various parts of the program
   private int level;
+  private static String pokemonName;
   private int totalEV = 0;
-  private String pokemonSpecies = "";
-  private String pokemonNature = "";
+  private String pokemonSpecies;
+  private String pokemonNature;
+  private boolean isShiny = false;
 
   // These two variables below are used for my decision structures.
   private int userNatureChoice = 0;
   private int userPokemonChoice = 0;
-  private HashMap<Integer, String> typeList = new HashMap<Integer, String>();
-
-  //Get, Set, and size for the typeList Dictionary
-  public String getTypeList(int a) {
-    return typeList.get(a);
-  }
-  public void setTypeList(int a, String b) {
-    this.typeList.put(a, b);
-  }
-  public int numberOfTypes() {
-    return typeList.size();
-  }
+  private static HashMap<Integer, String> typeList = new HashMap<Integer, String>();
 
   // These arrays are used for print statements.
   private String[] statNames = { "Hp", "Att", "Def", "SpAtt", "SpDef",
       "Speed" };
-  
+
+  private static String[] typeNameArray = { "Normal", "Fighting", "Flying", "Poison",
+      "Ground", "Rock", "Bug", "Ghost", "Steel", "Fire", "Water", "Grass",
+      "Electric", "Psychic", "Ice", "Dragon", "Dark", "Fairy" };
+
   private String[] natureNames = { "Hardy", "Bold", "Modest", "Calm", "Timid",
       "Lonely", "Docile", "Mild", "Gentle", "Hasty", "Adamant", "Impish",
       "Serious", "Careful", "Jolly", "Naughty", "Lax", "Rash", "Bashful",
       "Naive", "Brave", "Relaxed", "Quiet", "Sassy", "Quirky" };
-  
-  private String[] typeNames = { "Normal", "Fighting", "Psychic", "Ghost",
-      "Dark", "Bug", "Flying", "Fire", "Grass", "Water", "Rock", "Ground",
-      "Steel", "Fairy", "Electric", "Ice", "Dragon", "Fairy", "Poison" };
 
-  // This is the default constructor for my class.
+  ///////////// Constructor /////////////
   public Pokemon() {
   }
 
-  // Get and Set for the currentStats array values.
-  // In this method, 'a' is the parameter.
+  ///////////// pokemonNameArrayList /////////////
+
+  ///////////// typeList /////////////
+  public String getTypeList(int a) {
+    return typeList.get(a);
+  }
+
+  public void setTypeList(int a, String b) {
+    this.typeList.put(a, b);
+  }
+
+  public int numberOfTypes() {
+    return typeList.size();
+  }
+
+  ///////////// isShiny /////////////
+  public boolean getIsShiny() {
+    return isShiny;
+  }
+
+  public void setIsShiny(boolean b) {
+    this.isShiny = b;
+  }
+
+  ///////////// currentStats /////////////
   public int getCurrentStat(int a) {
     return currentStats[a];
   }
@@ -66,7 +85,7 @@ public class Pokemon {
     this.currentStats[a] = b;
   }
 
-  // Get and Set for the pokemonID variabel
+  ///////////// pokemonID /////////////
   public int getPokemonID() {
     return pokemonID;
   }
@@ -75,7 +94,7 @@ public class Pokemon {
     this.pokemonID = pokemonID;
   }
 
-  // Get and Set for the pokemonName variable
+  ///////////// pokemonName /////////////
   public void setPokemonName(String s) {
     this.pokemonName = s;
   }
@@ -84,7 +103,7 @@ public class Pokemon {
     return pokemonName;
   }
 
-  // Get and Set for the userNatureChoice variable.
+  ///////////// userNatureChoice /////////////
   public int getUserNatureChoice() {
     return userNatureChoice;
   }
@@ -93,7 +112,7 @@ public class Pokemon {
     this.userNatureChoice = a;
   }
 
-  // Get and Set for the userPokemonChoice variable.
+  ///////////// userPokemonChoice /////////////
   public int getUserPokemonChoice() {
     return userPokemonChoice;
   }
@@ -102,7 +121,7 @@ public class Pokemon {
     this.userPokemonChoice = a;
   }
 
-  // Get and Set for the Level variable.
+  ///////////// level /////////////
   public int getLevel() {
     return level;
   }
@@ -111,7 +130,7 @@ public class Pokemon {
     this.level = lev;
   }
 
-  // Get and Set for the baseStats array values.
+  ///////////// baseStats /////////////
   public void setBaseStats(int position, int value) {
     this.baseStats[position] = value;
   }
@@ -120,9 +139,73 @@ public class Pokemon {
     return baseStats[position];
   }
 
-  // Get and Set for the NatureMultiplier array values.
+  ///////////// filePokemonData /////////////
+  public static void FilePokemonData(int ID) throws IOException {
+    boolean IDFound = false;
+    boolean typeFound = false;
+    boolean nameFound = false;
+    // Finds the pokemon's baseStats
+    FileReader statsFile = new FileReader(
+        "C:/Users/chris/OneDrive/Documents/Java "
+            + "2017/Resources/pokemon_stats.csv");
+    BufferedReader statsReader = new BufferedReader(statsFile);
+    statsReader.readLine();
+    while (IDFound == false) {
+      String hpLine = statsReader.readLine();
+      String lineID = hpLine.substring(0, hpLine.indexOf(","));
+      if (ID == Integer.parseInt(lineID)) {
+        String[] tempArray1 = hpLine.split(",");
+        baseStats[0] = Integer.parseInt((tempArray1[2]));
+        IDFound = true;
+      }
+    }
+    for (int i = 0; i < 5; i++) {
+      String currentLine = statsReader.readLine();
+      String[] tempArray2 = currentLine.split(",");
+      baseStats[i + 1] = Integer.parseInt(tempArray2[2]);
+    }
+    statsReader.close();
+    // Finds the pokemon's types.
+    FileReader typeFile = new FileReader(
+        "C:/Users/chris/OneDrive/Documents/Java "
+            + "2017/Resources/pokemon_types.csv");
+    BufferedReader typeReader = new BufferedReader(typeFile);
+    typeReader.readLine();
+    while (typeFound == false) {
+      String type1Line = typeReader.readLine();
+      String[] type1Array = type1Line.split(",");
+      if (Integer.parseInt(type1Array[0]) == ID) {
+        typeList.put(0, typeNameArray[Integer.parseInt(type1Array[1])-1]);
+        String type2Line = typeReader.readLine();
+        if (Integer
+            .parseInt(type2Line.substring(0, type2Line.indexOf(","))) == ID) {
+          String[] type2Array = type2Line.split(",");
+          typeList.put(1, typeNameArray[Integer.parseInt(type2Array[1])-1]);
+          typeFound = true;
+        }
+        typeFound = true;
+      }
+    }
+    typeReader.close();
+    // Finds the Pokemon's name
+    FileReader nameFile = new FileReader(
+        "C:/Users/chris/OneDrive/Documents/Java "
+            + "2017/Resources/pokemon.csv");
+    BufferedReader nameReader = new BufferedReader(nameFile);
+    nameReader.readLine();
+    while (nameFound == false) {
+      String nameLine = nameReader.readLine();
+      String[] temporaryNameArray = nameLine.split(",");
+      if (Integer.parseInt(temporaryNameArray[0]) == ID) {
+        pokemonName = temporaryNameArray[1];
+        nameFound = true;
+      }
+    }
+    nameReader.close();
+  }
+
+  ///////////// natureMult /////////////
   public void setNatureMult(int a, int b) {
-    // Every nature raises one stat by 10% and lowers another by 10%.
     this.natureMultiplier[a] = 1.1;
     this.natureMultiplier[b] = .9;
   }
@@ -131,7 +214,7 @@ public class Pokemon {
     return natureMultiplier[a];
   }
 
-  // Get and Set the EV array values
+  ///////////// effortValue /////////////
   public int getEV(int e) {
     return effortValue[e];
   }
@@ -140,7 +223,7 @@ public class Pokemon {
     this.effortValue[e] = v;
   }
 
-  // Get and Set the IV array values.
+  ///////////// individualValue /////////////
   public int getIV(int i) {
     return individualValue[i];
   }
@@ -149,7 +232,7 @@ public class Pokemon {
     this.individualValue[i] = v;
   }
 
-  // Get and Set the TotalEV variable.
+  ///////////// totalEV /////////////
   public void setTotalEV(int a) {
     this.totalEV = a;
   }
@@ -158,7 +241,7 @@ public class Pokemon {
     return totalEV;
   }
 
-  // Get and Set for the PokemonType variable.
+  ///////////// pokemonSpecies /////////////
   public String getPokemonType() {
     return pokemonSpecies;
   }
@@ -167,15 +250,21 @@ public class Pokemon {
     this.pokemonSpecies = s;
   }
 
+  ///////////// statNames /////////////
   public String getStatNames(int a) {
     return statNames[a];
   }
 
+  ///////////// natureNames /////////////
   public String natureNames(int a) {
     return natureNames[a];
   }
 
-  // This method is used for error handling.
+  public String[] natureNamesArray() {
+    return natureNames;
+  }
+
+  ///////////// resetEVs /////////////
   public void resetAllEV() {
     for (int i = 0; i < 6; i++) {
       effortValue[i] = 0;
@@ -187,7 +276,7 @@ public class Pokemon {
     effortValue[a] = 0;
   }
 
-  // Get and Set for maximumStats array values
+  ///////////// maximumStats /////////////
   public int getMaxStat(int a) {
     return maximumStats[a];
   }
@@ -196,7 +285,7 @@ public class Pokemon {
     this.maximumStats[a] = b;
   }
 
-  // Get and Set for the minimumStats array values
+  ///////////// minimumStats /////////////
   public int getMinStat(int a) {
     return minimumStats[a];
   }
@@ -205,7 +294,7 @@ public class Pokemon {
     this.minimumStats[a] = b;
   }
 
-  // This method calculates the minimum stats for a pokemon.
+  ///////////// Calculate minimumStats /////////////
   public void calculateMinStats() {
     minimumStats[0] = (int) Math.floor(
         (2 * baseStats[0] + (effortValue[0] / 4)) * level / 100 + 10 + level);
@@ -216,7 +305,7 @@ public class Pokemon {
     }
   }
 
-  // This method calculates the maximum stats for a pokemon
+  ///////////// Calculate maximumStats /////////////
   public void calculateMaxStats() {
     maximumStats[0] = (int) (Math
         .floor((31 + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100)
@@ -228,20 +317,21 @@ public class Pokemon {
     }
   }
 
+  ///////////// Solve currentStats /////////////
   public void solveCurrentStats() {
-    // This calculates the current stats for a Pokemon.
-    currentStats[0] = (int) (Math
-        .floor((31 + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100)
-        + 10 + level);
+    currentStats[0] = (int) (Math.floor(
+        (getIV(0) + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100) + 10
+        + level);
     for (int i = 1; i < 6; i++) {
       currentStats[i] = (int) (Math.floor(
-          (31 + 2 * baseStats[i] + (effortValue[i] / 4)) * level / 100 + 5)
+          (getIV(i) + 2 * baseStats[i] + (effortValue[i] / 4)) * level / 100
+              + 5)
           * natureMultiplier[i]);
     }
   }
 
+  ///////////// Solve individualValue /////////////
   public void solveForIVs() {
-    // This method calculates the IVs of a Pokemon.
     individualValue[0] = ((currentStats[0] - level - 10) * (100 / level)
         - (effortValue[0] / 4) - 2 * baseStats[0]);
     for (int i = 1; i < 6; i++) {
@@ -251,123 +341,214 @@ public class Pokemon {
     }
   }
 
-  // Pokemon nature is set in the calculateNature method.
+  ///////////// pokemonNature natureMult /////////////
   public String getPokemonNature() {
     return pokemonNature;
   }
 
-  // This method sets the natureMult array and the Pokemon's nature
-  public void calculateNature(int natureChoice) {
-    /*
-     * A pokemon's nature raises one stat by 10% and lowers another by 10%. The
-     * HP stat is never raised or lowered, so we have a total of 25 possible
-     * natures.
-     */
+  public void calculateNature(String natureChoice) {
     switch (natureChoice) {
-      case 1:
+      case "Hardy":
         // This case is where the same stat is both raised and lowered,
         // canceling out.
         pokemonNature = natureNames(0);
         break;
-      case 2:
+      case "Bold":
         setNatureMult(2, 1);
         pokemonNature = natureNames(1);
         break;
-      case 3:
+      case "Modest":
         setNatureMult(3, 1);
         pokemonNature = natureNames(2);
         break;
-      case 4:
+      case "Calm":
         setNatureMult(4, 1);
         pokemonNature = natureNames(3);
         break;
-      case 5:
+      case "Timid":
         setNatureMult(5, 1);
         pokemonNature = natureNames(4);
         break;
-      case 6:
+      case "Lonely":
         setNatureMult(1, 2);
         pokemonNature = natureNames(5);
         break;
-      case 7:
+      case "Docile":
         // This case is where the same stat is both raised and lowered,
         // canceling out.
         pokemonNature = natureNames(6);
         break;
-      case 8:
+      case "Mild":
         setNatureMult(3, 2);
         pokemonNature = natureNames(7);
         break;
-      case 9:
+      case "Gentle":
         setNatureMult(4, 2);
         pokemonNature = natureNames(8);
         break;
-      case 10:
+      case "Hasty":
         setNatureMult(5, 2);
         pokemonNature = natureNames(9);
         break;
-      case 11:
+      case "Adamant":
         setNatureMult(1, 3);
         pokemonNature = natureNames(10);
         break;
-      case 12:
+      case "Impish":
         setNatureMult(2, 3);
         pokemonNature = natureNames(11);
         break;
-      case 13:
+      case "Serious":
         // This case is where the same stat is both raised and lowered,
         // canceling out.
         pokemonNature = natureNames(12);
         break;
-      case 14:
+      case "Careful":
         setNatureMult(4, 3);
         pokemonNature = natureNames(13);
         break;
-      case 15:
+      case "Jolly":
         setNatureMult(5, 3);
         pokemonNature = natureNames(14);
         break;
-      case 16:
+      case "Naughty":
         setNatureMult(1, 4);
         pokemonNature = natureNames(15);
         break;
-      case 17:
+      case "Lax":
         setNatureMult(2, 4);
         pokemonNature = natureNames(16);
         break;
-      case 18:
+      case "Rash":
         setNatureMult(3, 4);
         pokemonNature = natureNames(17);
-      case 19:
+      case "Bashful":
         // This case is where the same stat is both raised and lowered,
         // canceling out.
         pokemonNature = natureNames(18);
         break;
-      case 20:
+      case "Naive":
         setNatureMult(5, 4);
         pokemonNature = natureNames(19);
         break;
-      case 21:
+      case "Brave":
         setNatureMult(1, 5);
         pokemonNature = natureNames(20);
         break;
-      case 22:
+      case "Relaxed":
         setNatureMult(2, 5);
         pokemonNature = natureNames(21);
         break;
-      case 23:
+      case "Quiet":
         setNatureMult(3, 5);
         pokemonNature = natureNames(22);
         break;
-      case 24:
+      case "Sassy":
         setNatureMult(4, 5);
         pokemonNature = natureNames(23);
         break;
-      case 25:
+      case "Quirky":
         // This case is where the same stat is both raised and lowered,
         // canceling out.
         pokemonNature = natureNames(24);
         break;
     }
+  }
+
+  public int[] getTypeColor(String type) {
+    int[] colorArray = { 0, 0, 0 };
+    switch (type) {
+      case "Bug":
+        colorArray[0] = 168;
+        colorArray[1] = 184;
+        colorArray[2] = 32;
+        break;
+      case "Dark":
+        colorArray[0] = 112;
+        colorArray[1] = 88;
+        colorArray[2] = 72;
+        break;
+      case "Dragon":
+        colorArray[0] = 112;
+        colorArray[1] = 56;
+        colorArray[2] = 248;
+        break;
+      case "Electric":
+        colorArray[0] = 248;
+        colorArray[1] = 208;
+        colorArray[2] = 48;
+        break;
+      case "Fairy":
+        colorArray[0] = 238;
+        colorArray[1] = 153;
+        colorArray[2] = 172;
+        break;
+      case "Fighting":
+        colorArray[0] = 192;
+        colorArray[1] = 48;
+        colorArray[2] = 40;
+        break;
+      case "Fire":
+        colorArray[0] = 240;
+        colorArray[1] = 128;
+        colorArray[2] = 48;
+        break;
+      case "Flying":
+        colorArray[0] = 168;
+        colorArray[1] = 144;
+        colorArray[2] = 240;
+        break;
+      case "Ghost":
+        colorArray[0] = 112;
+        colorArray[1] = 88;
+        colorArray[2] = 152;
+        break;
+      case "Grass":
+        colorArray[0] = 120;
+        colorArray[1] = 200;
+        colorArray[2] = 80;
+        break;
+      case "Ground":
+        colorArray[0] = 224;
+        colorArray[1] = 192;
+        colorArray[2] = 104;
+        break;
+      case "Ice":
+        colorArray[0] = 152;
+        colorArray[1] = 216;
+        colorArray[2] = 216;
+        break;
+      case "Normal":
+        colorArray[0] = 168;
+        colorArray[1] = 168;
+        colorArray[2] = 120;
+        break;
+      case "Poison":
+        colorArray[0] = 160;
+        colorArray[1] = 64;
+        colorArray[2] = 160;
+        break;
+      case "Psychic":
+        colorArray[0] = 248;
+        colorArray[1] = 88;
+        colorArray[2] = 136;
+        break;
+      case "Rock":
+        colorArray[0] = 184;
+        colorArray[1] = 160;
+        colorArray[2] = 56;
+        break;
+      case "Steel":
+        colorArray[0] = 184;
+        colorArray[1] = 184;
+        colorArray[2] = 208;
+        break;
+      case "Water":
+        colorArray[0] = 104;
+        colorArray[1] = 144;
+        colorArray[2] = 240;
+        break;
+    }
+    return colorArray;
   }
 }
