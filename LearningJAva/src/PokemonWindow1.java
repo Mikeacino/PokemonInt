@@ -1,19 +1,13 @@
 
 ///////////// Michael Carracino /////////////
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,28 +15,24 @@ import javax.swing.SwingConstants;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.MatteBorder;
-import java.awt.Dimension;
-import java.awt.Component;
 
 public class PokemonWindow1 {
   public PokemonWindow1(Pokemon poke) throws IOException {
     ///////////// Frame /////////////
-    JFrame pokemonFrame = new JFrame();
+    JFrame pokemonFrame = new JFrame("Pokemon Info Page");
     pokemonFrame.setResizable(false);
     pokemonFrame.setLocationRelativeTo(null);
     pokemonFrame.setSize(800, 800);
 
     ///////////// Image /////////////
-    String imagePath = "C:/Users/chris/OneDrive/Documents/Java 2017/Resources/sprites/pokemon/"+poke.getPokemonID()+".png";
+    String imagePath = "sprites/pokemon/"+poke.getPokemonID()+".png";
     BufferedImage image = ImageIO.read(new File(imagePath));
     JLabel imageLabel = new JLabel(
         new ImageIcon(image.getScaledInstance(400, 400, Image.SCALE_DEFAULT)));
     imageLabel.setBounds(20, 20, 400, 400);
     imageLabel.setForeground(Color.WHITE);
     imageLabel.setBorder(new LineBorder(new Color(0, 0, 0), 2, true));
+    pokemonFrame.getContentPane().add(imageLabel);
 
     ///////////// Name /////////////
     String name = poke.getPokemonName();
@@ -83,12 +73,12 @@ public class PokemonWindow1 {
       gbc_lblType_2.gridy = 0;
       pokemonFrame.getContentPane().add(lblType_2, gbc_lblType_2);
     }
+    
     ///////////// Level /////////////
     JLabel lblLevel = new JLabel("Lvl: " + poke.getLevel());
     lblLevel.setBounds(441, 194, 135, 60);
     lblLevel.setFont(new Font("Serif", Font.PLAIN, 40));
     pokemonFrame.getContentPane().add(lblLevel);
-    pokemonFrame.getContentPane().add(imageLabel);
 
     ///////////// Nature /////////////
     JLabel lblNature = new JLabel(poke.getPokemonNature());

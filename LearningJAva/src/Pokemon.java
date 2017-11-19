@@ -1,16 +1,14 @@
 
 ///////////// Michael Carracino /////////////
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Pokemon {
   // The arrays below are used for the Pokemon stat formula.
   private int[] effortValue = { 0, 0, 0, 0, 0, 0 };
-  private static int[] baseStats = { 0, 0, 0, 0, 0, 0 };
+  private int[] baseStats = { 0, 0, 0, 0, 0, 0 };
   private int[] individualValue = { 0, 0, 0, 0, 0, 0 };
   private int[] currentStats = { 0, 0, 0, 0, 0, 0 };
   private int[] minimumStats = { 0, 0, 0, 0, 0, 0 };
@@ -24,22 +22,28 @@ public class Pokemon {
 
   // The variables below are used in various parts of the program
   private int level;
-  private static String pokemonName;
+  private String pokemonName;
   private int totalEV = 0;
   private String pokemonSpecies;
   private String pokemonNature;
+
+  // These two are for getting the image of the Pokemon
   private boolean isShiny = false;
+  private boolean isBackwards = false;
+
+  // This is for the pokemon description, or flavor text
+  private String flavorText;
 
   // These two variables below are used for my decision structures.
   private int userNatureChoice = 0;
   private int userPokemonChoice = 0;
-  private static HashMap<Integer, String> typeList = new HashMap<Integer, String>();
+  private HashMap<Integer, String> typeMap = new HashMap<Integer, String>();
 
   // These arrays are used for print statements.
   private String[] statNames = { "Hp", "Att", "Def", "SpAtt", "SpDef",
       "Speed" };
 
-  private static String[] typeNameArray = { "Normal", "Fighting", "Flying", "Poison",
+  private String[] typeNameArray = { "Normal", "Fighting", "Flying", "Poison",
       "Ground", "Rock", "Bug", "Ghost", "Steel", "Fire", "Water", "Grass",
       "Electric", "Psychic", "Ice", "Dragon", "Dark", "Fairy" };
 
@@ -52,19 +56,22 @@ public class Pokemon {
   public Pokemon() {
   }
 
-  ///////////// pokemonNameArrayList /////////////
+  public Pokemon(int ID) throws IOException {
+    setPokemonID(ID);
+    FilePokemonData(ID);
+  }
 
   ///////////// typeList /////////////
   public String getTypeList(int a) {
-    return typeList.get(a);
+    return typeMap.get(a);
   }
 
   public void setTypeList(int a, String b) {
-    this.typeList.put(a, b);
+    this.typeMap.put(a, b);
   }
 
   public int numberOfTypes() {
-    return typeList.size();
+    return this.typeMap.size();
   }
 
   ///////////// isShiny /////////////
@@ -140,14 +147,20 @@ public class Pokemon {
   }
 
   ///////////// filePokemonData /////////////
-  public static void FilePokemonData(int ID) throws IOException {
+  /*
+   * I wanted to move all of my file readers to one method, so I didn't have to
+   * search around when I needed them
+   */
+  public void FilePokemonData(int ID) throws IOException {
     boolean IDFound = false;
     boolean typeFound = false;
     boolean nameFound = false;
+    // boolean descriptionFound = false;
+    // This variable is commented out until i can solve my issue with getting
+    // the descriptions for pokemon
+
     // Finds the pokemon's baseStats
-    FileReader statsFile = new FileReader(
-        "C:/Users/chris/OneDrive/Documents/Java "
-            + "2017/Resources/pokemon_stats.csv");
+    FileReader statsFile = new FileReader("pokemon_stats.csv");
     BufferedReader statsReader = new BufferedReader(statsFile);
     statsReader.readLine();
     while (IDFound == false) {
@@ -165,32 +178,31 @@ public class Pokemon {
       baseStats[i + 1] = Integer.parseInt(tempArray2[2]);
     }
     statsReader.close();
+
     // Finds the pokemon's types.
-    FileReader typeFile = new FileReader(
-        "C:/Users/chris/OneDrive/Documents/Java "
-            + "2017/Resources/pokemon_types.csv");
+    FileReader typeFile = new FileReader("pokemon_types.csv");
     BufferedReader typeReader = new BufferedReader(typeFile);
     typeReader.readLine();
     while (typeFound == false) {
       String type1Line = typeReader.readLine();
       String[] type1Array = type1Line.split(",");
       if (Integer.parseInt(type1Array[0]) == ID) {
-        typeList.put(0, typeNameArray[Integer.parseInt(type1Array[1])-1]);
+        this.typeMap.put(0, typeNameArray[Integer.parseInt(type1Array[1]) - 1]);
         String type2Line = typeReader.readLine();
         if (Integer
             .parseInt(type2Line.substring(0, type2Line.indexOf(","))) == ID) {
           String[] type2Array = type2Line.split(",");
-          typeList.put(1, typeNameArray[Integer.parseInt(type2Array[1])-1]);
+          this.typeMap.put(1,
+              typeNameArray[Integer.parseInt(type2Array[1]) - 1]);
           typeFound = true;
         }
         typeFound = true;
       }
     }
     typeReader.close();
+
     // Finds the Pokemon's name
-    FileReader nameFile = new FileReader(
-        "C:/Users/chris/OneDrive/Documents/Java "
-            + "2017/Resources/pokemon.csv");
+    FileReader nameFile = new FileReader("pokemon.csv");
     BufferedReader nameReader = new BufferedReader(nameFile);
     nameReader.readLine();
     while (nameFound == false) {
@@ -202,6 +214,24 @@ public class Pokemon {
       }
     }
     nameReader.close();
+
+    // Finds the pokemon's description
+    // FileReader descriptionFile = new
+    // FileReader("pokemon_species_flavor_text.csv");
+    // BufferedReader descriptionReader = new BufferedReader(descriptionFile);
+    // descriptionReader.readLine();
+    // int counter = 0;
+    // while (descriptionFound == false) {
+    // String descriptionLine = descriptionReader.readLine();
+    // String[] temporaryDescriptionArray = descriptionLine.split(",");
+    // if (Integer.parseInt(temporaryDescriptionArray[0]) == ID &&
+    // Integer.parseInt(temporaryDescriptionArray[1]) == 23 &&
+    // Integer.parseInt(temporaryDescriptionArray[2]) == 9) {
+    // this.flavorText = temporaryDescriptionArray[3];
+    // descriptionFound = true;
+    // }
+    // }
+    // descriptionReader.close();
   }
 
   ///////////// natureMult /////////////
@@ -294,7 +324,7 @@ public class Pokemon {
     this.minimumStats[a] = b;
   }
 
-  ///////////// Calculate minimumStats /////////////
+  ///////////// Calculate minimumStats with known variables /////////////
   public void calculateMinStats() {
     minimumStats[0] = (int) Math.floor(
         (2 * baseStats[0] + (effortValue[0] / 4)) * level / 100 + 10 + level);
@@ -305,7 +335,7 @@ public class Pokemon {
     }
   }
 
-  ///////////// Calculate maximumStats /////////////
+  ///////////// Calculate maximumStats with known variables /////////////
   public void calculateMaxStats() {
     maximumStats[0] = (int) (Math
         .floor((31 + 2 * baseStats[0] + (effortValue[0] / 4)) * level / 100)
@@ -314,6 +344,23 @@ public class Pokemon {
       maximumStats[i] = (int) (Math.floor(
           (31 + 2 * baseStats[i] + (effortValue[i] / 4)) * level / 100 + 5)
           * natureMultiplier[i]);
+    }
+  }
+
+  ///////////// Calculate the Absolute maximumStats /////////////
+  public void calculateAbsoluteMaxStats() {
+    maximumStats[0] = (int) (Math.floor((31 + 2 * baseStats[0] + 63)) + 110);
+    for (int i = 1; i < 6; i++) {
+      maximumStats[i] = (int) (Math.floor((31 + 2 * baseStats[i] + 63) + 5)
+          * 1.1);
+    }
+  }
+
+  ///////////// Calculate the Absolute minimumStats /////////////
+  public void calculateAbsoluteMinStats() {
+    minimumStats[0] = (int) Math.floor((2 * baseStats[0]) + 110);
+    for (int i = 1; i < 6; i++) {
+      minimumStats[i] = (int) Math.floor(((2 * baseStats[i]) + 5) * 0.9);
     }
   }
 
@@ -550,5 +597,21 @@ public class Pokemon {
         break;
     }
     return colorArray;
+  }
+
+  public boolean getIsBackwards() {
+    return isBackwards;
+  }
+
+  public void setIsBackwards(boolean isBackwards) {
+    this.isBackwards = isBackwards;
+  }
+
+  public String getFlavorText() {
+    return flavorText;
+  }
+
+  public void setFlavorText(String flavorText) {
+    this.flavorText = flavorText;
   }
 }

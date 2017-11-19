@@ -1,26 +1,17 @@
 import javax.swing.JFrame;
 import java.awt.Font;
 
-import java.awt.GridBagLayout;
 import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import java.awt.Dimension;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import java.awt.Color;
 
@@ -38,7 +29,7 @@ public class StatCalcWindow {
   private JTextField textField_IV_SpAtt;
   private JTextField textField_IV_SpDef;
   private JTextField textField_IV_SpD;
-  private JComboBox textField_Poke_ID;
+  private JComboBox<?> textField_Poke_ID;
 
   public StatCalcWindow() throws Exception {
     String[] natureNames = { "Hardy", "Bold", "Modest", "Calm", "Timid",
@@ -46,7 +37,7 @@ public class StatCalcWindow {
         "Serious", "Careful", "Jolly", "Naughty", "Lax", "Rash", "Bashful",
         "Naive", "Brave", "Relaxed", "Quiet", "Sassy", "Quirky" };
 
-    JFrame statCalcFrame = new JFrame();
+    JFrame statCalcFrame = new JFrame("Stat Calculator");
     statCalcFrame.getContentPane().setMinimumSize(new Dimension(10, 10));
     statCalcFrame.setResizable(false);
     statCalcFrame.setLocationRelativeTo(null);
@@ -59,9 +50,9 @@ public class StatCalcWindow {
     statCalcFrame.getContentPane().add(lblPokemon);
 
     String[] nameArray = createPokemonNameArray();
-    textField_Poke_ID = new JComboBox(nameArray);
+    textField_Poke_ID = new JComboBox<Object>(nameArray);
     textField_Poke_ID.setFont(new Font("Serif", Font.PLAIN, 50));
-    textField_Poke_ID.setBounds(326, 52, 200, 60);
+    textField_Poke_ID.setBounds(252, 52, 274, 60);
     statCalcFrame.getContentPane().add(textField_Poke_ID);
 
     ///////////////// Level /////////////////
@@ -84,7 +75,7 @@ public class StatCalcWindow {
     lblNature.setFont(new Font("Serif", Font.PLAIN, 50));
     statCalcFrame.getContentPane().add(lblNature);
 
-    JComboBox<?> natureComboBox = new JComboBox(natureNames);
+    JComboBox<?> natureComboBox = new JComboBox<Object>(natureNames);
     natureComboBox.setBounds(326, 128, 200, 71);
     natureComboBox.setPreferredSize(new Dimension(30, 30));
     natureComboBox.setFont(new Font("Serif", Font.PLAIN, 50));
@@ -249,7 +240,7 @@ public class StatCalcWindow {
   public void getWindowData(JComboBox<?> natureComboBox,
       AbstractButton rdbtnShiny) throws IOException {
     Pokemon poke = new Pokemon();
-    poke.setPokemonID(textField_Poke_ID.getSelectedIndex()+1);
+    poke.setPokemonID(textField_Poke_ID.getSelectedIndex() + 1);
     poke.FilePokemonData(poke.getPokemonID());
     if (rdbtnShiny.isSelected()) {
       poke.setIsShiny(true);
@@ -271,13 +262,13 @@ public class StatCalcWindow {
     poke.setIV(4, Integer.parseInt(textField_IV_SpDef.getText()));
     poke.setIV(5, Integer.parseInt(textField_IV_SpD.getText()));
     poke.solveCurrentStats();
+    @SuppressWarnings("unused")
     PokemonWindow1 pokeWin = new PokemonWindow1(poke);
   }
 
   public String[] createPokemonNameArray() throws Exception {
     String[] temporaryArray = new String[802];
-    FileReader file = new FileReader(
-        "C:/Users/chris/OneDrive/Documents/Java 2017/Resources/pokemon.csv");
+    FileReader file = new FileReader("pokemon.csv");
     BufferedReader reader = new BufferedReader(file);
     reader.readLine();
     for (int i = 0; i < 802; i++) {
