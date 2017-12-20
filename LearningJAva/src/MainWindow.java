@@ -1,62 +1,81 @@
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
 import java.awt.Font;
-
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+/**
+ * Creates the first window that links to the Pokedex and the Stat Calculator.
+ * 
+ * @author Michael Carracino
+ */
 
 public class MainWindow {
-  public MainWindow() {
-    JFrame mainFrame = new JFrame("Main Window");
-    mainFrame.setSize(500, 300);
+  /**
+   * Creates the main window along with buttons and tools.
+   */
+  public void initializeWindow() {
+    JFrame mainFrame = new JFrame();
+    mainFrame.setSize(400, 600);
     mainFrame.setResizable(false);
     mainFrame.setLocationRelativeTo(null);
     mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     JPanel panel = new JPanel();
+    panel.setBorder(null);
     mainFrame.getContentPane().add(panel, BorderLayout.NORTH);
-
-    JLabel lblPokemonProject = new JLabel("Pokemon Project");
+    JLabel lblPokemonProject = new JLabel("Pokelator");
     lblPokemonProject.setFont(new Font("Serif", Font.PLAIN, 50));
     panel.add(lblPokemonProject);
 
-    JPanel panel_1 = new JPanel();
-    mainFrame.getContentPane().add(panel_1, BorderLayout.CENTER);
-    panel_1.setLayout(null);
+    JPanel panelOne = new JPanel();
+    panelOne.setBorder(null);
+    mainFrame.getContentPane().add(panelOne, BorderLayout.CENTER);
+    panelOne.setLayout(null);
 
-    JButton btnStatsCalc = new JButton("Stats");
-    btnStatsCalc.setFont(new Font("Serif", Font.PLAIN, 30));
-    btnStatsCalc.addActionListener(new ActionListener() {
+    JButton statsCalcBtn = new JButton("Stats");
+    statsCalcBtn.setFont(new Font("Serif", Font.PLAIN, 30));
+    statsCalcBtn.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         try {
-          @SuppressWarnings("unused")
-          StatCalcWindow basic = new StatCalcWindow();
+          StatCalcWindow win = new StatCalcWindow();
+          win.buildWindow();
         } catch (Exception e) {
-          e.printStackTrace();
+          System.out.println(e);
+          ErrorWindow error = new ErrorWindow();
+          error.buildWindow(e);
         }
       }
     });
-    btnStatsCalc.setBounds(175, 21, 150, 47);
-    panel_1.add(btnStatsCalc);
+    statsCalcBtn.setBounds(100, 190, 200, 60);
+    panelOne.add(statsCalcBtn);
 
-    JButton btnInfo = new JButton("Pokedex");
-    btnInfo.setFont(new Font("Serif", Font.PLAIN, 30));
-    btnInfo.setBounds(175, 89, 150, 47);
-    panel_1.add(btnInfo);
-    btnInfo.addActionListener(new ActionListener() {
+    JButton pokedexBtn = new JButton("Pokedex");
+    pokedexBtn.setFont(new Font("Serif", Font.PLAIN, 30));
+    pokedexBtn.setBounds(100, 70, 200, 60);
+    panelOne.add(pokedexBtn);
+
+    JButton infoButton = new JButton("Information");
+    infoButton.setEnabled(false);
+    infoButton.setFont(new Font("Serif", Font.PLAIN, 30));
+    infoButton.setBounds(100, 310, 200, 60);
+    panelOne.add(infoButton);
+    pokedexBtn.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         try {
-          @SuppressWarnings("unused")
           PokedexWindow infoWindow = new PokedexWindow();
+          infoWindow.randomWindow();
         } catch (Exception e) {
-          e.printStackTrace();
+          ErrorWindow error = new ErrorWindow();
+          error.buildWindow(e);
         }
       }
     });
 
     mainFrame.setResizable(false);
     mainFrame.setVisible(true);
+
   }
 }

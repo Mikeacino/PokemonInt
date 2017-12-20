@@ -16,8 +16,9 @@ import javax.swing.SwingConstants;
 import java.awt.Color;
 import javax.swing.border.LineBorder;
 
-public class PokemonWindow1 {
-  public PokemonWindow1(Pokemon poke) throws IOException {
+public class PokemonStatsDisplayWindow {
+  public void buildStatsDisplayWindow(Pokemon poke) throws IOException {
+
     ///////////// Frame /////////////
     JFrame pokemonFrame = new JFrame("Pokemon Info Page");
     pokemonFrame.setResizable(false);
@@ -25,7 +26,13 @@ public class PokemonWindow1 {
     pokemonFrame.setSize(800, 800);
 
     ///////////// Image /////////////
-    String imagePath = "sprites/pokemon/"+poke.getPokemonID()+".png";
+    String imagePath;
+    if (poke.getIsShiny() == true) {
+      imagePath = "sprites/pokemon/shiny/" + poke.getPokemonID() + ".png";
+
+    } else {
+      imagePath = "sprites/pokemon/" + poke.getPokemonID() + ".png";
+    }
     BufferedImage image = ImageIO.read(new File(imagePath));
     JLabel imageLabel = new JLabel(
         new ImageIcon(image.getScaledInstance(400, 400, Image.SCALE_DEFAULT)));
@@ -73,7 +80,7 @@ public class PokemonWindow1 {
       gbc_lblType_2.gridy = 0;
       pokemonFrame.getContentPane().add(lblType_2, gbc_lblType_2);
     }
-    
+
     ///////////// Level /////////////
     JLabel lblLevel = new JLabel("Lvl: " + poke.getLevel());
     lblLevel.setBounds(441, 194, 135, 60);
